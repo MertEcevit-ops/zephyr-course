@@ -3,6 +3,9 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
 
+#include <cerrno>
+#include <cstdlib>
+
 #include "led_sensor.h"
 
 #define LED_SENSOR_NODE DT_COMPAT_GET_ANY_STATUS_OKAY(zephyr_led_sensor)
@@ -52,10 +55,34 @@ static int cmd_sensor_info(const struct shell *shell, size_t argc, char **argv)
     return 0;
 }
 
+static int cmd_sensor_set(const struct shell *shell, size_t argc, char **argv)
+{
+    char *end;
+    unsigned long enabled;
+
+    ARG_UNUSED(argc);
+
+    errno = 0;
+    enabled = strtoul(argv[1], &end, 10);
+    if (errno != 0 || end == argv[1] || *end != '\0' || enabled > 1U) {
+        shell_error(shell, "value must be 0 (off) or 1 (on)");
+        return -EINVAL;
+    }
+
+    if (led_sensor_set_enabled(led_sensor, enabled != 0U) < 0) {
+        shell_error(shell, "failed to set sensor state");
+        return -EIO;
+    }
+
+    shell_print(shell, "sensor %s", enabled != 0U ? "enabled" : "disabled");
+    return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sensor_cmds,
     SHELL_CMD(fetch, NULL, "Fetch a sensor sample", cmd_sensor_fetch),
     SHELL_CMD(read, NULL, "Read the light channel", cmd_sensor_read),
     SHELL_CMD(info, NULL, "Show sensor device information", cmd_sensor_info),
+    SHELL_CMD_ARG(set, NULL, "Set sensor state: 0=off, 1=on", cmd_sensor_set, 1, 0),
     SHELL_SUBCMD_SET_END
 );
 
