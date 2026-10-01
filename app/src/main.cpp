@@ -2,6 +2,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include "led_sensor.h"
+
 #define LED_SENSOR_NODE DT_COMPAT_GET_ANY_STATUS_OKAY(zephyr_led_sensor)
 
 static const struct device *const led_sensor = DEVICE_DT_GET(LED_SENSOR_NODE);
@@ -20,11 +22,13 @@ int main(void)
     if (!device_is_ready(led_sensor)) return 0;
 
     while (1) {
+        if (led_sensor_set_enabled(led_sensor, true) < 0) return 0;
         if (sensor_sample_fetch(led_sensor) < 0) return 0;
         LOG_INF("LED on");
         k_msleep(CONFIG_APP_HEARTBEAT_PERIOD_MS);
 
         if (sensor_channel_get(led_sensor, SENSOR_CHAN_LIGHT, &value) < 0) return 0;
+        if (led_sensor_set_enabled(led_sensor, false) < 0) return 0;
         LOG_INF("LED off");
         k_msleep(CONFIG_APP_HEARTBEAT_PERIOD_MS);
     }

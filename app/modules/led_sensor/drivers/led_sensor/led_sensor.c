@@ -18,7 +18,25 @@ struct led_sensor_config {
 
 struct led_sensor_data {
 	int32_t value;
+	bool enabled;
 };
+
+int led_sensor_set_enabled(const struct device *dev, bool enabled)
+{
+	const struct led_sensor_config *config = dev->config;
+	struct led_sensor_data *data = dev->data;
+
+	if (!device_is_ready(dev) || !gpio_is_ready_dt(&config->led)) {
+		return -ENODEV;
+	}
+
+	data->enabled = enabled;
+	if (!enabled && gpio_pin_set_dt(&config->led, 0) < 0) {
+		return -EIO;
+	}
+
+	return 0;
+}
 
 static int led_sensor_sample_fetch(const struct device *dev,
 					  enum sensor_channel chan)
@@ -32,6 +50,9 @@ static int led_sensor_sample_fetch(const struct device *dev,
 
 	if (!gpio_is_ready_dt(&config->led)) {
 		return -ENODEV;
+	}
+	if (!data->enabled) {
+		return -EACCES;
 	}
 
 	if (gpio_pin_set_dt(&config->led, 1) < 0) {
@@ -66,11 +87,13 @@ static int led_sensor_channel_get(const struct device *dev,
 static int led_sensor_init(const struct device *dev)
 {
 	const struct led_sensor_config *config = dev->config;
+	struct led_sensor_data *data = dev->data;
 
 	if (!gpio_is_ready_dt(&config->led)) {
 		return -ENODEV;
 	}
 
+	data->enabled = true;
 	return gpio_pin_configure_dt(&config->led, GPIO_OUTPUT_INACTIVE);
 }
 
