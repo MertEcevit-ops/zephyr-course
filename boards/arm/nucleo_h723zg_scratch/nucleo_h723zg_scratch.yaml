@@ -1,0 +1,13 @@
+identifier: nucleo_h723zg_scratch
+name: Scratch Nucleo H723ZG
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+ram: 372
+flash: 1024
+supported:
+  - uart
+  - gpio
+vendor: st
