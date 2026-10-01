@@ -11,6 +11,11 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
+/**
+ * @brief Main function
+ *
+ * This function initializes the LED and toggles it in a loop on STM32H723ZG Nucleo board.
+ */
 int main(void)
 {
     bool led_state = true;
