@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig LED_SENSOR
+  bool "LED sensor driver"
+  default y
+  depends on DT_HAS_ZEPHYR_LED_SENSOR_ENABLED
+  select GPIO
+  select SENSOR
+  help
+    Enable the sensor driver backed by an on-board LED.

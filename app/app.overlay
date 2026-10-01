@@ -1,4 +1,10 @@
 / {
+	led_sensor: led-sensor {
+		compatible = "zephyr,led-sensor";
+		gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
 	aliases {
 		app-led = &green_led;
 	};

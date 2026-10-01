@@ -1,0 +1,8 @@
+description: LED-backed demo sensor
+
+compatible: "zephyr,led-sensor"
+
+properties:
+  gpios:
+    type: phandle-array
+    required: true
