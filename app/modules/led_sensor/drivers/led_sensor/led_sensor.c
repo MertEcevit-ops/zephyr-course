@@ -31,7 +31,7 @@ int led_sensor_set_enabled(const struct device *dev, bool enabled)
 	}
 
 	data->enabled = enabled;
-	if (!enabled && gpio_pin_set_dt(&config->led, 0) < 0) {
+	if (gpio_pin_set_dt(&config->led, enabled ? 1 : 0) < 0) {
 		return -EIO;
 	}
 
